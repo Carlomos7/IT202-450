@@ -14,7 +14,7 @@
     background-color: teal;
 }
 nav li{display: inline; background-color: rgb(4, 144, 64);}
-nav li a{color: white}
+nav li a{color: black}
 input{border-radius: 5%;}
 body{
     background-color: rgb(220, 220, 220);
