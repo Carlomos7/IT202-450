@@ -12,18 +12,9 @@ require(__DIR__ . "/../../partials/nav.php");
     </div>
     <input type="submit" value="Login" />
 </form>
-<script>
-    function validate(form) {
+<script src = "validate.js">
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
-        let email = form.email.value
-        const re = new RegExp('/^[a-z0-9_-]{3,16}$/');
-        if(email.test(re)){
-            return true;
-        }else{
-            return false;
-        }
-    }
 </script>
 <?php
 //TODO 2: add PHP Code

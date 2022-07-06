@@ -125,7 +125,15 @@ $username = get_username();
         let con = form.confirmPassword.value;
         let isValid = true;
         //TODO add other client side validation....
-
+        let email = form.email.value;
+        const reEmail = new RegExp('/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/');
+    
+        let username = form.username.value;
+        const reUser = new RegExp('/^[a-z0-9_-]{3,16}$/');
+        if(!email.test(reEmail) && !username.test(reUser)){
+            isValid = false;
+            flash("Invalid username/email", "warning");
+        }
         //example of using flash via javascript
         //find the flash container, create a new element, appendChild
         if (pw !== con) {

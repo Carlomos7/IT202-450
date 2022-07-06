@@ -21,13 +21,9 @@ reset_session();
     </div>
     <input type="submit" value="Register" />
 </form>
-<script>
-    function validate(form) {
+<script src = "validate.js">
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
-
-        return true;
-    }
 </script>
 <?php
 //TODO 2: add PHP Code
