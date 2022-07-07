@@ -1,0 +1,16 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "askForPassword": true,
+            "driver": "MySQL",
+            "name": "IT202",
+            "connectString": "mysql://cs525:hz4yPzN0HnqU@db.ethereallab.app:3306/cs525"
+        }
+    ]
+}
