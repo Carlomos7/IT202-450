@@ -12,7 +12,7 @@ require(__DIR__ . "/../../partials/nav.php");
     </div>
     <input type="submit" value="Login" />
 </form>
-<script src = "validate.js">
+<script type="text/javascript" src = "Project/helpers.js">
         //TODO 1: implement JavaScript validation
         //ensure it returns false for an error and true for success
 </script>
