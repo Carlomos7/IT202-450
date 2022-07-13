@@ -14,5 +14,6 @@ function is_valid_username($username)
 }
 function is_valid_password($password)
 {
-    return strlen($password) >= 8;
+    return ($password) >= 8;
+    //return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/',$password);
 }
