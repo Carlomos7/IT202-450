@@ -21,5 +21,14 @@ require(__DIR__ . "/duplicate_user_details.php");
 //reset session
 require(__DIR__ . "/reset_session.php");
 
+//get columns
+require(__DIR__ . "/get_columns.php");
+//save data
+require(__DIR__ . "/save_data.php");
+//input map
+require(__DIR__ . "/input_map.php");
+//update data
+require(__DIR__ . "/update_data.php");
+
 require(__DIR__ . "/get_url.php");
 ?>
