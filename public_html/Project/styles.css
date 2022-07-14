@@ -1,17 +1,21 @@
 .alert-success {
-    background-color: green
+    background-color: #5db899;
+    color: darkgreen;
 }
 
 .alert-warning {
-    background-color: yellow;
+    background-color: #FFFEC3;
+    color: darkgoldenrod;
 }
 
 .alert-danger {
-    background-color: red;
+    background-color: #FF9288;
+    color: darkred;
 }
 
 .alert-info {
-    background-color: teal;
+    background-color: #A4D7EC;
+    color: darkblue;
 }
 nav li{display: inline; background-color: rgb(4, 144, 64);}
 nav li a{color: black}
