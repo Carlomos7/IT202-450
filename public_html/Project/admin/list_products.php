@@ -1,11 +1,11 @@
 <?php
 //note we need to go up 1 more directory
 require(__DIR__ . "/../../../partials/nav.php");
-$TABLE_NAME = "RM_Products";
-/*if (!has_role("Admin")) {
+$TABLE_NAME = "Products";
+if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
     die(header("Location: $BASE_PATH/home.php"));
-}*/
+}
 
 $results = [];
 if (isset($_POST["productName"])) {

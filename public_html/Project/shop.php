@@ -3,7 +3,7 @@
 
 $results = [];
 $db = getDB();
-$stmt = $db->prepare("SELECT id, name, description, cost, stock, image FROM RM_Products WHERE stock > 0 LIMIT 50");
+$stmt = $db->prepare("SELECT id, name, description, cost, stock, image FROM Products WHERE stock > 0 LIMIT 50");
 try {
     $stmt->execute();
     $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -20,6 +20,7 @@ try {
         console.log("TODO purchase product", product);
         alert("Fake transaction for this bogus product processed! :)");
         //TODO create JS helper to update all show-balance elements
+
     }
 </script>
 
@@ -30,7 +31,7 @@ try {
             <div class="col">
                 <div class="card bg-light">
                     <div class="card-header">
-                        RM Placeholder
+                        [Maybe Seller Name]
                     </div>
                     <?php if (se($product, "image", "", false)) : ?>
                         <img src="<?php se($product, "image"); ?>" class="card-img-top" alt="...">
@@ -41,8 +42,13 @@ try {
                         <p class="card-text">Description: <?php se($product, "description"); ?></p>
                     </div>
                     <div class="card-footer">
-                        Cost: <?php se($product, "cost"); ?>
-                        <button onclick="purchase('<?php se($product, 'id'); ?>')" class="btn btn-primary">Buy Now</button>
+                        Price: <?php se($product, "cost"); ?> | <?php se($product, "stock");?> in stock
+                        <form method="POST" action="cart.php">
+                            <input type="hidden" name="product_id" value="<?php se($product, "id");?>"/>
+                            <input type="hidden" name="action" value="add"/>
+                            <input type="number" name="desired_quantity" value="1" min="1" max="<?php se($product, "stock");?>"/>
+                            <input type="submit" class="btn btn-primary" value="Add to Cart"/>
+                        </form>
                     </div>
                 </div>
             </div>
