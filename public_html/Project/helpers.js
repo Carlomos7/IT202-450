@@ -30,3 +30,7 @@ function isValidEmail(email){
 function isEqual(a,b){
     return a === b;
 }
+/*function toUsd(a){
+    var a = (total).toLocaleString('en');
+    return a;
+    }*/
