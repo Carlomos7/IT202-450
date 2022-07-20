@@ -128,7 +128,7 @@ try {
         <?php foreach ($cart as $c) : ?>
             <tr>
                 <td><?php se($c, "name"); ?></td>
-                <td><?php se($c, "unit_price"); ?></td>
+                <td>$<?php se($c, "unit_price"); ?></td>
                 <td>
                     <form method="POST">
                         <input type="hidden" name="cart_id" value="<?php se($c, "id"); ?>" />
@@ -138,7 +138,7 @@ try {
                     </form>
                 </td>
                 <?php $total += (int)se($c, "subtotal", 0, false); ?>
-                <td><?php se($c, "subtotal"); ?></td>
+                <td>$<?php se($c, "subtotal"); ?></td>
                 <td>
                     <form method="POST">
                         <input type="hidden" name="cart_id" value="<?php se($c, "id"); ?>" />
@@ -154,7 +154,12 @@ try {
             </tr>
         <?php endif; ?>
         <tr>
-            <td colspan="100%">Total: <?php se($total, null, 0); ?></td>
+            <th colspan="3">Total: $<?php se($total, null, 0); ?> </th>
+            <td>
+                <form action="<?php echo get_url('purchase_cart.php');?>">
+                    <input type="submit" class="btn btn-success" value="Checkout" />
+                </form>
+            </td>
             <td>
                 <form method="POST">
                     <input type="hidden" name="cart_id" value="<?php se($c, "id"); ?>" />

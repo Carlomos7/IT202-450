@@ -1,12 +1,7 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
 ?>
-<h1>Welcome to Shop Shop</h1>
-<div></div>
-<h4>Selection of Products</h4>
-<?php
-require(__DIR__ ."/shop.php");
-?>
+<h1>Welcome</h1>
 <?php
 
 if (is_logged_in(true)) {
