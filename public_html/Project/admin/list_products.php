@@ -10,7 +10,7 @@ if (!has_role("Admin")) {
 $results = [];
 if (isset($_POST["productName"])) {
     $db = getDB();
-    $stmt = $db->prepare("SELECT id, name, description, category, stock, cost, image from $TABLE_NAME WHERE name like :name OR category like :name LIMIT 50");
+    $stmt = $db->prepare("SELECT id, name, description, category, stock, cost, image, visibility from $TABLE_NAME WHERE name like :name OR category like :name LIMIT 50");
     try {
         $stmt->execute([":name" => "%" . $_POST["productName"] . "%"]);
         $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
