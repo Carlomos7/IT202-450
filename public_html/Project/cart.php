@@ -93,7 +93,7 @@ if (!empty($action)) {
             break;
     }
 }
-$query = "SELECT cart.id, product.stock, product.name, cart.unit_price, (cart.unit_price * cart.desired_quantity) as subtotal, cart.desired_quantity
+$query = "SELECT cart.id, cart.product_id, product.stock, product.name, cart.unit_price, (cart.unit_price * cart.desired_quantity) as subtotal, cart.desired_quantity
 FROM Products as product JOIN Cart_Alt as cart on product.id = cart.product_id
  WHERE cart.user_id = :uid";
 $db = getDB();
@@ -127,7 +127,7 @@ try {
         <tbody>
         <?php foreach ($cart as $c) : ?>
             <tr>
-                <td><?php se($c, "name"); ?></td>
+                <td><a class="link-success" href="product_details.php?id=<?php se($c,"product_id");?>"><?php se($c, "name"); ?></a></td>
                 <td>$<?php se($c, "unit_price"); ?></td>
                 <td>
                     <form method="POST">

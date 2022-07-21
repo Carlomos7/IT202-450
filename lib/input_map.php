@@ -6,7 +6,7 @@ function input_map($fieldType)
         return "text";
     } else if ($fieldType === "text") {
         return "textarea";
-    } else if (in_array($fieldType, ["int", "decimal"])) { //TODO fill in as needed
+    } else if (in_array($fieldType, ["int", "decimal","tinyint"])) { //TODO fill in as needed
         return "number";
     }
     return "text"; //default

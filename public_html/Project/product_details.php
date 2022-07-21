@@ -56,8 +56,11 @@ function map_column($col)
 						<form method="POST" action="cart.php">
                                 <input type="hidden" name="product_id" value="<?php se($result, "id");?>"/>
                                 <input type="hidden" name="action" value="add"/>
-                                <input type="number" name="desired_quantity" value="1" min="1" max="<?php se($product, "stock");?>"/>
+                                <input type="number" name="desired_quantity" value="1" min="1" max="<?php se($result, "stock");?>"/>
                                 <input type="submit" class="btn btn-primary" value="Add to Cart"/>
+								<?php if (has_role("Admin")) : ?>
+									<a type= "button" class="btn btn-danger" href="admin/edit_products.php?id=<?php se($result, "id"); ?>">Edit</a>
+								<?php endif; ?>
                         </form>
 					</div>
 				</div>

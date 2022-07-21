@@ -15,8 +15,7 @@ if (isset($_POST["submit"])) {
 //get the table definition
 $columns = get_columns($TABLE_NAME);
 //echo "<pre>" . var_export($columns, true) . "</pre>";
-$ignore = ["id", "modified", "created","visibility"];
-$ignore2 = ["id", "modified", "created","name","description","stock","cost","Image","category"];
+$ignore = ["id", "modified", "created"];
 ?>
 <div class="container-fluid">
     <h1>Sell</h1>
@@ -27,12 +26,6 @@ $ignore2 = ["id", "modified", "created","name","description","stock","cost","Ima
                 <div class="mb-4">
                     <label class="form-label" for="<?php se($column, "Field"); ?>"><?php se($column, "Field"); ?></label>
                     <input class="form-control" id="<?php se($column, "Field"); ?>" type="<?php echo input_map(se($column, "Type", "", false)); ?>" name="<?php se($column, "Field"); ?>" />
-                </div>
-            <?php endif; ?>
-            <?php if (!in_array($column["Field"], $ignore2)) : ?>
-                <div class="mb-4">
-                    <label class="form-label" for="<?php se($column, "Field"); ?>"><?php se($column, "Field"); ?></label>
-                    <input class="form-control" id="<?php se($column, "Field"); ?>" type="number" min=0 max=1 name="<?php se($column, "Field"); ?>" />
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>

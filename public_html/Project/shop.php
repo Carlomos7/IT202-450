@@ -1,7 +1,7 @@
 <?php
 require(__DIR__ . "/../../partials/nav.php");
 //require_once(__DIR__ . "/../../lib/functions.php");
-
+//cs525 7-20-2022
 $results = [];
 $db = getDB();
 //process filters/sorting
@@ -39,6 +39,7 @@ if(!empty($category)){
 if (!empty($col) && !empty($order)) {
     $query .= " ORDER BY $col $order"; //be sure you trust these values, I validate via the in_array checks above
 }
+//cs525 07-20-2022
 $stmt = $db->prepare($query); //dynamically generated query
 //$stmt = $db->prepare("SELECT id, name, description, cost, stock, image FROM BGD_Items WHERE stock > 0 LIMIT 50");
 try {
@@ -147,6 +148,9 @@ $db = getDB();
                                 <input type="hidden" name="action" value="add"/>
                                 <input type="number" name="desired_quantity" value="1" min="1" max="<?php se($product, "stock");?>"/>
                                 <input type="submit" class="btn btn-primary" value="Add to Cart"/>
+                                <?php if (has_role("Admin")) : ?>
+									<a type= "button" class="btn btn-danger" href="admin/edit_products.php?id=<?php se($product, "id"); ?>">Edit</a>
+								<?php endif; ?>
                             </form>
                         </div>
                     </div>
