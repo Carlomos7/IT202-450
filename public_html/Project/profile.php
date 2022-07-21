@@ -85,57 +85,68 @@ if (isset($_POST["save"])) {
 $email = get_user_email();
 $username = get_username();
 ?>
-<form method="POST" onsubmit="return validate(this);">
-    <div class="mb-3">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" value="<?php se($email); ?>" />
-    </div>
-    <div class="mb-3">
-        <label for="username">Username</label>
-        <input type="text" name="username" id="username" value="<?php se($username); ?>" />
-    </div>
-    <!-- DO NOT PRELOAD PASSWORD -->
-    <div>Password Reset</div>
-    <div class="mb-3">
-        <label for="cp">Current Password</label>
-        <input type="password" name="currentPassword" id="cp" />
-    </div>
-    <div class="mb-3">
-        <label for="np">New Password</label>
-        <input type="password" name="newPassword" id="np" />
-    </div>
-    <div class="mb-3">
-        <label for="conp">Confirm Password</label>
-        <input type="password" name="confirmPassword" id="conp" />
-    </div>
-    <input type="submit" value="Update Profile" name="save" />
-</form>
+<div class="container-fluid">
+    <h1>Profile</h1>
+    <form method="POST" onsubmit="return validate(this);">
+        <div class="mb-3">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-control" type="email" name="email" id="email" value="<?php se($email); ?>" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" type="text" name="username" id="username" value="<?php se($username); ?>" />
+        </div>
+        <!-- DO NOT PRELOAD PASSWORD -->
+        <div class="mb-3"><h3>Password Reset</h3></div>
+        <div class="mb-3">
+            <label class="form-label" for="cp">Current Password</label>
+            <input class="form-control" type="password" name="currentPassword" id="cp" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="np">New Password</label>
+            <input class="form-control" type="password" name="newPassword" id="np" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="conp">Confirm Password</label>
+            <input class="form-control" type="password" name="confirmPassword" id="conp" />
+        </div>
+        <input type="submit" class="mt-3 btn btn-primary" value="Update Profile" name="save" />
+    </form>
+</div>
 
 <script>
-    function validate(form) {
-        let pw = form.newPassword.value;
-        let con = form.confirmPassword.value;
+    function validate(form){
+        //TODO 1: implement JavaScript validation
+        //ensure it returns false for an error and true for success
         let isValid = true;
-        //TODO add other client side validation....
+
         let email = form.email.value;
-        const reEmail = new RegExp('/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/');
-    
         let username = form.username.value;
-        const reUser = new RegExp('/^[a-z0-9_-]{3,16}$/');
-        if(!email.test(reEmail)){
-            isValid = false;
-            flash("Invalid email", "warning");
-        }
-        if(!username.test(reUser)){
-            isValid=false;
-            flash("Invalid username","warning")
-        }
-        //example of using flash via javascript
-        //find the flash container, create a new element, appendChild
-        if (pw !== con) {
-            flash("Password and Confrim password must match", "warning");
+        let current = form.currentPassword.value;
+        let newPass = form.newPassword.value;
+        let confirm = form.confirmPassword.value;
+
+        if(!isValidEmail(email)){
+            flash("Invalid email address","warning");
             isValid = false;
         }
+        if(!isValidUsername(username)){
+            flash("Username must only contain 3-16 characters a-z, 0-9, _, or -","warning");
+            isValid = false;
+        }
+        if(!isValidPassword(current)){
+            flash("Current password is invalid","warning");
+            isValid = false;
+        }
+        if(!isValidPassword(newPass)){
+            flash("New password must be a minimum of eight characters", "warning");
+            isValid = false;
+        }
+        if(newPass && !isEqual(newPass,confirm)){
+            flash("New passwords must match","warning");
+            isValid = false;
+        }
+
         return isValid;
     }
 </script>
