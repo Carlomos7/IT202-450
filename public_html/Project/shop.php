@@ -20,15 +20,18 @@ if (!in_array($order, ["asc", "desc"])) {
 $name = se($_GET, "searchShop", "", false);
 //category
 $category = se($_GET,"cat","",false);
+//Split query into data and total
+$base_query = "SELECT id, name, description, category, stock, cost, image FROM Products products";
+$total_query = "SELECT count(1) as total FROM Products products";
 //dynamic query
-$query = "SELECT id, name, description, category, stock, cost, image FROM Products products WHERE 1=1 and stock > 0"; //1=1 shortcut to conditionally build AND clauses
+$query = " WHERE stock >0"; //1=1 shortcut to conditionally build AND clauses
 $params = []; //define default params, add keys as needed and pass to execute
 //apply name filter
 if(!has_role("Admin")){
     $query .= " and visibility > 0";
 }
 if (!empty($name)) {
-    $query .= " AND name like :name OR category like :name";
+    $query .= " AND name like :name";
     $params[":name"] = "%$name%";
 }
 if(!empty($category)){
@@ -39,9 +42,44 @@ if(!empty($category)){
 if (!empty($col) && !empty($order)) {
     $query .= " ORDER BY $col $order"; //be sure you trust these values, I validate via the in_array checks above
 }
-//cs525 07-20-2022
-$stmt = $db->prepare($query); //dynamically generated query
+//paginate function
+$per_page = 10;
+paginate($total_query . $query, $params, $per_page);
+/* this comment block has been replaced by paginate()
+//get the total
+$stmt = $db->prepare($total_query . $query); //dynamically generated query
+$total = 0;
 //$stmt = $db->prepare("SELECT id, name, description, cost, stock, image FROM BGD_Items WHERE stock > 0 LIMIT 50");
+try {
+    $stmt->execute($params); //dynamically populated params to bind
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($r) {
+        $results = $r;
+        //$total = (int)se($r, "total", 0, false);
+    }
+} catch (PDOException $e) {
+    error_log(var_export($e, true));
+    flash("Error fetching items", "danger");
+}
+//apply the pagination (the pagination stuff will be moved to reusable pieces later)
+$page = se($_GET, "page", 1, false); //default to page 1 (human readable number)
+$per_page = 10; //how many items to show per page (hint, this could also be something the user can change via a dropdown or similar)
+$offset = ($page - 1) * $per_page;
+end commented out coded moved to paginate()*/
+$query .= " LIMIT :offset, :count";
+$params[":offset"] = $offset;
+$params[":count"] = $per_page;
+//get the records
+$stmt = $db->prepare($base_query . $query); //dynamically generated query
+//we'll want to convert this to use bindValue so ensure they're integers so lets map our array
+foreach ($params as $key => $value) {
+    $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+    $stmt->bindValue($key, $value, $type);
+}
+$params = null; //set it to null to avoid issues
+
+
+//$stmt = $db->prepare("SELECT id, name, description, cost, stock, image FROM RM_Items WHERE stock > 0 LIMIT 50");
 try {
     $stmt->execute($params); //dynamically populated params to bind
     $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -52,6 +90,8 @@ try {
     error_log(var_export($e, true));
     flash("Error fetching items", "danger");
 }
+
+
 $reCat = [];
 $db = getDB();
     $stmt = $db->prepare("SELECT DISTINCT category FROM Products");
@@ -72,11 +112,16 @@ $db = getDB();
     <form class="row row-cols-lg-auto g-3 align-items-center">
         <div class="input-group mb-3">
             <input class="form-control" type="search" name="searchShop" placeholder="Search Shop" value="<?php se($name); ?>"/>  
-            <select class="form-select bg-success" aria-label="Default select example" name="cat" value="<?php se($category); ?>">
+            <select class="form-select bg-success" aria-label="Default select example" name="cat" value="<?php se($category); ?>" data="took">
                 <?php foreach($reCat as $cat) : ?>
                 <option value="<?php se($cat,"category"); ?>"><?php se($cat,"category"); ?></option>
                 <?php endforeach; ?>
             </select>
+            <script>
+                    //quick fix to ensure proper value is selected since
+                    //value setting only works after the options are defined and php has the value set prior
+                    document.forms[0].cat.value = "Choose Category";
+            </script>
             
             <!-- sorting -->
             <div class="col">
@@ -166,6 +211,7 @@ $db = getDB();
 
     }
 </script>
-<?php
+<?php 
+require(__DIR__ . "/../../partials/pagination.php");
 require(__DIR__ . "/../../partials/flash.php");
 ?>
