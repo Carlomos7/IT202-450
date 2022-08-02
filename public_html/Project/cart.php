@@ -155,10 +155,9 @@ try {
         <?php endif; ?>
         <tr>
             <th colspan="3">Total: $<?php se($total, null, 0); ?> </th>
+            <?php if (count($cart) !== 0) : ?>
             <td>
-                <form action="<?php echo get_url('purchase_cart.php');?>">
-                    <input type="submit" class="btn btn-success" value="Checkout" />
-                </form>
+                <a href="<?php echo get_url('checkout.php');?>" class="btn btn-success">Checkout</a>
             </td>
             <td>
                 <form method="POST">
@@ -167,6 +166,7 @@ try {
                     <input type="submit" class="btn btn-danger" value="Clear Cart X" />
                 </form>
             </td>
+            <?php endif; ?>
         </tr>
         </tbody>
     </table>
