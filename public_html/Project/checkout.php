@@ -2,7 +2,7 @@
 require(__DIR__ . "/../../partials/nav.php");
 
 is_logged_in(true);
-error_log("purchase_cart received data: " . var_export($_REQUEST, true));
+error_log("checkout received data: " . var_export($_REQUEST, true));
 if (session_status() != PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -21,7 +21,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
     $firstname= se($_POST,"firstName","",false);
     $lastname= se($_POST,"lastName","",false);
     //getting cart
-    $db = getDB();
+    $db = getDB();                                                                  //vvv cost is pulled from Products table not cart this is also true in the product summary and cart page
     $stmt = $db->prepare("SELECT name, c.id as line_id, product_id, desired_quantity, cost, (cost*desired_quantity) as subtotal FROM Cart_Alt c JOIN Products p on c.product_id = p.id WHERE c.user_id = :uid");
     try {
         $stmt->execute([":uid" => $user_id]);
@@ -54,11 +54,29 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 WHERE id in (SELECT product_id from Cart_Alt where user_id = :uid)");
                 try {
                     $stmt->execute([":uid" => $user_id]);
-                } catch (PDOException $e) {
+                  } catch (PDOException $e) {
                     error_log("Update stock error: " . var_export($e, true));
                     $response["message"] = "At least one of your items is low on stock and is unable to be purchased";
                     $db->rollback();
                     $next_order_id = 0; //using as a controller
+                    //Verifying the current product's unit_price against the Products table's unit_price
+                    //if there is a mismatch a flash message is shown with the product and stock in quesiton
+                    $stmt = $db->prepare("SELECT cart.desired_quantity, cart.product_id, product.stock, product.name, product.cost
+                    FROM Products as product JOIN Cart_Alt as cart on product.id = cart.product_id WHERE cart.user_id = :uid");                  
+                    try{
+                      $stmt->execute([":uid" => $user_id]);
+                      $check=$stmt->fetchAll(PDO::FETCH_ASSOC);
+                      foreach($check as $record){
+                        if((int)se($record,"stock",0,false)<(int)se($record,"desired_quantity",0,false)){
+                          flash(se($record,"name",0,false)." has only ".se($record,"stock",0,false)." in stock","danger");
+                        }                      
+                      }
+                      flash("Please update the desired quantities in your cart","warning");  
+
+                    }catch(PDOException $e){
+                      error_log(var_export($e,true));
+                    }
+
                 }
             }
             //map cart to order history
@@ -109,12 +127,11 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
 }
 //echo json_encode($response);
 flash(json_encode($response));
-flash($address);
 
 
 
-//Fetching cart items for purchase summary
-$query = "SELECT cart.id, cart.product_id, product.stock, product.name, cart.unit_price, (cart.unit_price * cart.desired_quantity) as subtotal, cart.desired_quantity
+//Fetching cart items for purchase summary. Product cost is pulled from products table
+$query = "SELECT cart.id, cart.product_id, product.stock, product.name, product.cost, (product.cost * cart.desired_quantity) as subtotal, cart.desired_quantity
 FROM Products as product JOIN Cart_Alt as cart on product.id = cart.product_id
  WHERE cart.user_id = :uid";
 $db = getDB();
@@ -134,12 +151,6 @@ if (count($cart) == 0){
   flash("There are no items in your cart", "warning");
   die(header("Location: $BASE_PATH/shop.php"));
 }
-
-/*if(isset($_POST["purchase"])){
-  flash("This button be working","success");
-}*/
-
-
 
 
 
