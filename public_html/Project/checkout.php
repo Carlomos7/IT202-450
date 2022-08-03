@@ -34,7 +34,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
         }
         if ($balance >= $total_cost) {//if the user can afford the total cost
             //can purchase
-            $db->beginTransaction();
+            $db->beginTransaction(); //transaction can begin and entry will be inserted into Orders table
             $stmt = $db->prepare("INSERT INTO Orders (user_id, total_price, user_address, payment_method, money_recieved, first_name, last_name) VALUES(:user_id, :total_price, :user_address, :payment_method, :money_recieved, :first_name, :last_name)");
             $next_order_id = 0;
             //get next order id
@@ -42,13 +42,13 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 $stmt->execute([":user_id"=>$user_id,":total_price"=>$total_cost,":user_address"=>$address,":payment_method"=>$pay_method,":money_recieved"=>$user_payment,":first_name"=>$firstname,":last_name"=>$lastname]);
                 $r = $stmt->fetch(PDO::FETCH_ASSOC);
                 $next_order_id = (int)se($r, "id", 0, false);
-                $next_order_id= $db->lastInsertId();
+                $next_order_id= $db->lastInsertId(); //last insertId from Orders table
             } catch (PDOException $e) {
                 error_log("Error fetching order_id: " . var_export($e));
                 $db->rollback();
             }
             //deduct product stock (used to determine if out of stock as it'll fail with a constraint violation)
-            if ($next_order_id > 0) {
+            if ($next_order_id > 0) {//updating Product table stock for each product to detuct the desired quantity
                 $stmt = $db->prepare("UPDATE Products 
                 set stock = stock - (select IFNULL(desired_quantity, 0) FROM Cart_Alt WHERE product_id = Products.id and user_id = :uid) 
                 WHERE id in (SELECT product_id from Cart_Alt where user_id = :uid)");
@@ -80,7 +80,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 }
             }
             //map cart to order history
-            if ($next_order_id > 0) {
+            if ($next_order_id > 0) { //Copying Cart table details into OrderProducts with OrderID from the previous steps
                 $stmt = $db->prepare("INSERT INTO OrderProducts (product_id, desired_quantity, unit_price, order_id) 
                 SELECT product_id, Cart_Alt.desired_quantity, unit_price, :order_id FROM Cart_Alt JOIN Products on Cart_Alt.product_id = Products.id
                  WHERE user_id = :uid");
@@ -93,7 +93,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 }
             }
             //clear the user's cart now that the process is done
-            if ($next_order_id > 0) {
+            if ($next_order_id > 0) { //Clearing user's cart after successful order
                 $stmt =  $db->prepare("DELETE from Cart_Alt where user_id = :uid");
                 try {
                     $stmt->execute([":uid" => $user_id]);
@@ -108,6 +108,10 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 $response["status"] = 200;
                 http_response_code(200);
                 $response["message"] = "Purchase complete";
+                
+                die(header("Location: $BASE_PATH/order_confirmation.php?id=$next_order_id"));
+                flash("Purchase complete!","success");
+
             } else {
                 $response["status"] = 200;
                 http_response_code(200);
@@ -147,10 +151,10 @@ try {
     error_log(var_export($e, true));
     flash("Error fetching cart", "danger");
 }
-if (count($cart) == 0){
+/*if (count($cart) == 0){
   flash("There are no items in your cart", "warning");
   die(header("Location: $BASE_PATH/shop.php"));
-}
+}*/
 
 
 
@@ -266,7 +270,7 @@ if (count($cart) == 0){
         <?php foreach ($cart as $c) : ?>
             <tr>
                 <td><a class="link-success" href="product_details.php?id=<?php se($c,"product_id");?>"><?php se($c, "name"); ?></a></td>
-                <td>$<?php se($c, "unit_price"); ?></td>
+                <td>$<?php se($c, "cost"); ?></td>
                 <td><?php se($c, "desired_quantity"); ?></td>
                 <?php $total += (int)se($c, "subtotal", 0, false); ?>
                 <td>$<?php se($c, "subtotal"); ?></td>

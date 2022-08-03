@@ -128,7 +128,7 @@ try {
         <?php foreach ($cart as $c) : ?>
             <tr>
                 <td><a class="link-success" href="product_details.php?id=<?php se($c,"product_id");?>"><?php se($c, "name"); ?></a></td>
-                <td>$<?php se($c, "unit_price"); ?></td>
+                <td>$<?php se($c, "cost"); ?></td>
                 <td>
                     <form method="POST">
                         <input type="hidden" name="cart_id" value="<?php se($c, "id"); ?>" />
