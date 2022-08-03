@@ -13,6 +13,7 @@ $pay_method="";
 $firstname="";
 $lastname="";
 $response = ["status" => 400, "message" => "There was a problem completing your purchase"];
+$flashmsg = "There was a problem completing your purchase";
 http_response_code(400);
 if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
     //setting form variable values to be inserted into Orders table
@@ -108,9 +109,9 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 $response["status"] = 200;
                 http_response_code(200);
                 $response["message"] = "Purchase complete";
-                
-                die(header("Location: $BASE_PATH/order_confirmation.php?id=$next_order_id"));
                 flash("Purchase complete!","success");
+                die(header("Location: $BASE_PATH/order_confirmation.php?id=$next_order_id"));
+                
 
             } else {
                 $response["status"] = 200;
@@ -120,6 +121,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
             $response["status"] = 402;
             http_response_code(200);
             $response["message"] = "You can't afford to purchase your cart";
+            flash("You can't afford to purchase your cart items","warning");
         }
     } catch (PDOException $e) {
         error_log("Error fetching cart" . var_export($e, true));
@@ -130,7 +132,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
     http_response_code(403);
 }
 //echo json_encode($response);
-flash(json_encode($response));
+json_encode($response);
 
 
 
@@ -142,7 +144,7 @@ $db = getDB();
 $stmt = $db->prepare($query);
 $cart = [];
 try {
-    $stmt->execute([":uid" => get_user_id()]);
+    $stmt->execute([":uid" => $user_id]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if ($results) {
         $cart = $results;
