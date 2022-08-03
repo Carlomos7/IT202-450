@@ -20,21 +20,6 @@ try {
     error_log(var_export($e, true));
     flash("Error fetching orders", "danger");
 }
-//getting products ids and names
-$query = "SELECT id, name FROM Products";
-$db = getDB();
-$stmt = $db->prepare($query);
-$products = [];
-try {
-    $stmt->execute();
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if ($results) {
-        $products = $results;
-    }
-} catch (PDOException $e) {
-    error_log(var_export($e, true));
-    flash("Error fetching orders", "danger");
-}
 ?>
 <script src="<?php echo get_url('helpers.js'); ?>"></script>
 <div class="container mt-5 mb-5">
@@ -42,7 +27,8 @@ try {
         <div class="card">
             <div></div>
             <br>
-            <h1>Your Order Confirmed!</h1>
+            <h1>Thank You</h1>
+            <h2>For Your Purchase :)</h2>
             <?php foreach($orders as $o) : ?>
             <span class="font-weight-bold d-block mt-4">Hello <b><?php se($o,"first_name"); ?></b>,</span>
             <?php break; ?>
