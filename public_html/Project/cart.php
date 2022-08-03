@@ -93,7 +93,7 @@ if (!empty($action)) {
             break;
     }
 }
-$query = "SELECT cart.id, cart.product_id, product.stock, product.name, cart.unit_price, (cart.unit_price * cart.desired_quantity) as subtotal, cart.desired_quantity
+$query = "SELECT cart.id, cart.product_id, product.stock, product.name, product.cost, (product.cost * cart.desired_quantity) as subtotal, cart.desired_quantity
 FROM Products as product JOIN Cart_Alt as cart on product.id = cart.product_id
  WHERE cart.user_id = :uid";
 $db = getDB();
