@@ -17,6 +17,7 @@ $query="SELECT id, user_id, total_price, payment_method, money_recieved, first_n
 if(!has_role("Admin")){
     $query.=" where user_id =:uid";
 }
+$query.=" ORDER BY created DESC LIMIT 10";
 $stmt = $db->prepare($query);
 try {
     if(!has_role("Admin")){

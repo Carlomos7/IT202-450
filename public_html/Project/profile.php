@@ -3,11 +3,16 @@ require_once(__DIR__ . "/../../partials/nav.php");
 is_logged_in(true);
 ?>
 <?php
+if(isset($_GET["id"])){
+    $user_id = se($_GET,"id",-1,false);
+}else{
+    $user_id = get_user_id();
+}
 if (isset($_POST["save"])) {
     $email = se($_POST, "email", null, false);
     $username = se($_POST, "username", null, false);
 
-    $params = [":email" => $email, ":username" => $username, ":id" => get_user_id()];
+    $params = [":email" => $email, ":username" => $username, ":id" => $user_id];
     $db = getDB();
     $stmt = $db->prepare("UPDATE Users set email = :email, username = :username where id = :id");
     try {
@@ -31,7 +36,7 @@ if (isset($_POST["save"])) {
     //select fresh data from table
     $stmt = $db->prepare("SELECT id, email, username from Users where id = :id LIMIT 1");
     try {
-        $stmt->execute([":id" => get_user_id()]);
+        $stmt->execute([":id" => $user_id]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($user) {
             //$_SESSION["user"] = $user;
@@ -55,14 +60,14 @@ if (isset($_POST["save"])) {
             //TODO validate current
             $stmt = $db->prepare("SELECT password from Users where id = :id");
             try {
-                $stmt->execute([":id" => get_user_id()]);
+                $stmt->execute([":id" => $user_id]);
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
                 if (isset($result["password"])) {
                     if (password_verify($current_password, $result["password"])) {
                         $query = "UPDATE Users set password = :password where id = :id";
                         $stmt = $db->prepare($query);
                         $stmt->execute([
-                            ":id" => get_user_id(),
+                            ":id" => $user_id,
                             ":password" => password_hash($new_password, PASSWORD_BCRYPT)
                         ]);
 
