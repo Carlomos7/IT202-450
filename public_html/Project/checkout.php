@@ -21,13 +21,32 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
     $pay_method = se($_POST,"payMethod","",false);
     $firstname= se($_POST,"firstName","",false);
     $lastname= se($_POST,"lastName","",false);
+    $user_payment+= (int)se($_POST,"amount","",false);
+    //phpvalidation
+    $hasError = false;
+    if(!$address){
+      flash("Please fill out address","warning");
+      $hasError = true;
+    }
+    if($pay_method == "Choose a Payment Method"){
+      flash("Please choose a payment method","warning");
+      $hasError = true;
+    }
+    if(!$firstname || !$lastname){
+      flash("Please enter first and last name","warning");
+      $hasError = true;
+    }
+    if($user_payment <= 0){
+      flash("Please enter correct payment amount","warning");
+      $hasError = true;
+    }
+    if(!$hasError){
     //getting cart
     $db = getDB();                                                                  //vvv cost is pulled from Products table not cart this is also true in the product summary and cart page
     $stmt = $db->prepare("SELECT name, c.id as line_id, product_id, desired_quantity, cost, (cost*desired_quantity) as subtotal FROM Cart_Alt c JOIN Products p on c.product_id = p.id WHERE c.user_id = :uid");
     try {
         $stmt->execute([":uid" => $user_id]);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $user_payment+= (int)se($_POST,"amount","",false);
         $balance = $user_payment;
         $total_cost = 0;
         foreach ($results as $row) {
@@ -126,6 +145,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
     } catch (PDOException $e) {
         error_log("Error fetching cart" . var_export($e, true));
     }
+}
 } else {
     $response["status"] = 403;
     $response["message"] = "You must be logged in to fetch your cart";
@@ -178,7 +198,7 @@ try {
               <div class="form-outline">
                 <!--<input type="text" id="payMethod" class="form-control" />-->
                 <select class="form-select" name="payMethod" aria-label="paymentmethod">
-                  <option selected>Pick Payment Method</option>
+                  <option selected>Choose a Payment Method</option>
                   <option value="Visa">Visa</option>
 	                <option value="Amex">Amex</option>
 	                <option value="Mastercard">Mastercard</option>
@@ -306,10 +326,52 @@ try {
 <script>
   function validate(form){
     let isValid=true;
+
+    let paymethod = form.payMethod.value;
+    let amount = form.value.amount;
+    let first = form.value.firstName;
+    let last = form.value.lastName;
+    let address = form.value.address;
+    let city = form.value.city;
+    let state = form.value.state;
+    let country = form.value.country;
+    let zip = form.value.zipcode;
+
+    if(paymethod=="Choose a Payment Method"){
+      flash("Please choose a payment method","warning");
+      isValid = false;
+    }
+    if(!amount || amount<=0){
+      flash("Please enter the correct payment amount","warning");
+      isValid=false;
+    }
+    if(!first){
+      flash("Please enter first name","warning");
+      isValid=false;
+    }
+    if(!last){
+      flash("Please enter last name","warning");
+      isValid=false;
+    }
+    if(!address){
+      flash("Please enter address","warning");
+      isValid=false;
+    }
+    if(!city){
+      flash("Please enter city","warning");
+      isValid=false;
+    }
+    if(!country){
+      flash("Please enter country","warning");
+      isValid=false;
+    }
+    if(!isValidZip(zip)){
+      flash("Invalid zip code","warning");
+      isValid=false;
+    }
     return isValid;
   }
 </script>
-
 <?php
 require(__DIR__ . "/../../partials/flash.php");
 ?>

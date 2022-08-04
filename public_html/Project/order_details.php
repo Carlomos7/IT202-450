@@ -3,15 +3,15 @@ require(__DIR__ . "/../../partials/nav.php");
 is_logged_in(true);
 $user_id= (int)get_user_id();
 $order_id=se($_GET,"id",-1,false);
-$query = "SELECT O.id, O.first_name, O.created, O.payment_method, O.money_recieved, O.user_address, OP.product_id, OP.desired_quantity, P.name,
+$query = "SELECT O.id, O.user_id, O.first_name, O.last_name, O.created, O.payment_method, O.money_recieved, O.user_address, OP.product_id, OP.desired_quantity, P.name,
 OP.unit_price, (OP.desired_quantity * OP.unit_price) as subtotal, O.total_price FROM OrderProducts as OP INNER JOIN Orders as O on O.id = OP.order_id 
 INNER JOIN Products as P on P.id = OP.product_id
-WHERE O.user_id = :uid AND O.id = :oid";
+WHERE O.id = :oid";
 $db = getDB();
 $stmt = $db->prepare($query);
 $orders = [];
 try {
-    $stmt->execute([":uid" => $user_id,":oid" => $order_id]);
+    $stmt->execute([":oid" => $order_id]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if ($results) {
         $orders = $results;
@@ -27,13 +27,12 @@ try {
         <div class="card">
             <div></div>
             <br>
-            <h1>Thank You</h1>
-            <h2>For Your Purchase :)</h2>
+            <h1>Order Details</h1>
             <?php foreach($orders as $o) : ?>
-            <span class="font-weight-bold d-block mt-4">Hello <b><?php se($o,"first_name"); ?></b>,</span>
+            <h3>Name:</h3> 
             <?php break; ?>
             <?php endforeach; ?>
-            <span>Your order has been confirmed and will be shipped out soon!</span>
+            <h4><?php se($o,"first_name"); ?> <?php se($o,"last_name"); ?></h4>
             <div class="card-body">
                 <h5 class="card-title">Order Information:</h5>
                 <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
@@ -70,8 +69,8 @@ try {
                             <?php foreach($orders as $o) : ?>
                                 <td width="40%"><b><a class="link-success" href="product_details.php?id=<?php se($o,"product_id");?>"><?php se($o,"name") ?></a></b>
                                 <div class="product-qty"> <span class="d-block">Quantity: <?php se($o,"desired_quantity") ?></span></div></td>
-                                <td width="50%"><?php se($o,"unit_price") ?></td>
-                                <td witdth="30%"><?php se($o,"subtotal") ?></td>
+                                <td width="30%"><?php se($o,"unit_price") ?></td>
+                                <td>$<?php se($o,"subtotal") ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -81,9 +80,9 @@ try {
                     <div class="col-md-5">
                         <table class="table table-borderless">
                             <tr class="totals">
-                                <th class="text-muted" width="75%">Total</th>
+                                <th class="text-muted" width="25%">Total</th>
                                 <?php foreach($orders as $o): ?>
-                                <td width="25%">$<?php se($o,"total_price") ?></td>
+                                <td>$<?php se($o,"total_price") ?></td>
                                 <?php break; ?>
                                 <?php endforeach; ?>
                             </tr>

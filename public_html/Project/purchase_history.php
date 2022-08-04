@@ -15,7 +15,7 @@ $db = getDB();
 //get the item
 $query="SELECT id, user_id, total_price, payment_method, money_recieved, first_name, last_name, created FROM Orders";
 if(!has_role("Admin")){
-    $query.=" where user_id =:uid LIMT 10";
+    $query.=" where user_id =:uid";
 }
 $stmt = $db->prepare($query);
 try {
@@ -57,11 +57,11 @@ function map_column($col)
             <div></div>
             <div class="card-body">
                 <div class="card-title">
-                    <h5>Order No: <?php se($order,"id"); ?></h5>
+                    <h5><a class="link-success" href="order_details.php?id=<?php se($order,"id");?>">Order No: <?php se($order,"id"); ?><a></h5>
                     <table class="table table-borderless">
                         <thead>
                             <tr>
-                                <th class="text-muted">Order Date</th>
+                                <th class="text-muted">Order Placed</th>
                                 <th class="text-muted">Name for Order</th>
                                 <th class="text-muted">Payment Method</th>
                                 <th class="text-muted">Total</th>
@@ -72,7 +72,7 @@ function map_column($col)
                                 <td><?php se($order,"created"); ?></td>
                                 <td><?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></td>
                                 <td><?php se($order,"payment_method"); ?></td>
-                                <td><?php se($order,"total_price"); ?></td>
+                                <td>$<?php se($order,"total_price"); ?></td>
                             </tr>
                         </tbody>
                     </table>
