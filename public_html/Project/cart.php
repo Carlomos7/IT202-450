@@ -93,7 +93,7 @@ if (!empty($action)) {
             break;
     }
 }
-$query = "SELECT cart.id, cart.product_id, product.stock, product.name, cart.unit_price, (cart.unit_price * cart.desired_quantity) as subtotal, cart.desired_quantity
+$query = "SELECT cart.id, cart.product_id, product.stock, product.name, product.cost, (product.cost * cart.desired_quantity) as subtotal, cart.desired_quantity
 FROM Products as product JOIN Cart_Alt as cart on product.id = cart.product_id
  WHERE cart.user_id = :uid";
 $db = getDB();
@@ -128,7 +128,7 @@ try {
         <?php foreach ($cart as $c) : ?>
             <tr>
                 <td><a class="link-success" href="product_details.php?id=<?php se($c,"product_id");?>"><?php se($c, "name"); ?></a></td>
-                <td>$<?php se($c, "unit_price"); ?></td>
+                <td>$<?php se($c, "cost"); ?></td>
                 <td>
                     <form method="POST">
                         <input type="hidden" name="cart_id" value="<?php se($c, "id"); ?>" />
@@ -155,10 +155,9 @@ try {
         <?php endif; ?>
         <tr>
             <th colspan="3">Total: $<?php se($total, null, 0); ?> </th>
+            <?php if (count($cart) !== 0) : ?>
             <td>
-                <form action="<?php echo get_url('purchase_cart.php');?>">
-                    <input type="submit" class="btn btn-success" value="Checkout" />
-                </form>
+                <a href="<?php echo get_url('checkout.php');?>" class="btn btn-success">Checkout</a>
             </td>
             <td>
                 <form method="POST">
@@ -167,6 +166,7 @@ try {
                     <input type="submit" class="btn btn-danger" value="Clear Cart X" />
                 </form>
             </td>
+            <?php endif; ?>
         </tr>
         </tbody>
     </table>
