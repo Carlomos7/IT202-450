@@ -3,9 +3,9 @@ require(__DIR__ . "/../../partials/nav.php");
 is_logged_in(true);
 $user_id= (int)get_user_id();
 $order_id=se($_GET,"id",-1,false);
-$query = "SELECT O.id, O.user_id, O.first_name, O.last_name, O.created, O.payment_method, O.money_recieved, O.user_address, OP.product_id, OP.desired_quantity, P.name,
+$query = "SELECT O.id, O.user_id, U.username, O.first_name, O.last_name, O.created, O.payment_method, O.money_recieved, O.user_address, OP.product_id, OP.desired_quantity, P.name,
 OP.unit_price, (OP.desired_quantity * OP.unit_price) as subtotal, O.total_price FROM OrderProducts as OP INNER JOIN Orders as O on O.id = OP.order_id 
-INNER JOIN Products as P on P.id = OP.product_id
+INNER JOIN Products as P on P.id = OP.product_id INNER JOIN Users as U on U.id = O.user_id 
 WHERE O.id = :oid";
 $db = getDB();
 $stmt = $db->prepare($query);
@@ -29,10 +29,15 @@ try {
             <br>
             <h1>Order Details</h1>
             <?php foreach($orders as $o) : ?>
-            <h3>Name:</h3> 
-            <?php break; ?>
+                <h3>Name:</h3> 
+                <?php if(has_role("Admin")): ?>
+                    <h4> @<a class="link-success" href="profile.php?id=<?php se($o,"user_id");?>"><?php se($o,"username") ?></a> <?php se($o,"first_name"); ?> <?php se($o,"last_name"); ?></h4>
+                    <?php else: ?>
+                    <h4><?php se($o,"first_name"); ?> <?php se($o,"last_name"); ?></h4>
+                <?php endif; ?>
+                <?php break; ?>
             <?php endforeach; ?>
-            <h4><?php se($o,"first_name"); ?> <?php se($o,"last_name"); ?></h4>
+            
             <div class="card-body">
                 <h5 class="card-title">Order Information:</h5>
                 <div class="payment border-top mt-3 mb-3 border-bottom table-responsive">
