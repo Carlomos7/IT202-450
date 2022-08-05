@@ -13,9 +13,9 @@ $columns = get_columns($TABLE_NAME);
 $ignore = ["modified"];
 $db = getDB();
 //get the item
-$query="SELECT id, user_id, total_price, payment_method, money_recieved, first_name, last_name, created FROM Orders";
+$query="SELECT O.id, O.user_id, O.total_price, O.payment_method, O.money_recieved, O.first_name, O.last_name, O.created, U.username FROM Orders as O JOIN Users as U on U.id = O.user_id";
 if(!has_role("Admin")){
-    $query.=" where user_id =:uid";
+    $query.=" WHERE O.user_id =:uid";
 }
 $query.=" ORDER BY created DESC LIMIT 10";
 $stmt = $db->prepare($query);
@@ -71,7 +71,11 @@ function map_column($col)
                         <tbody>
                             <tr>
                                 <td><?php se($order,"created"); ?></td>
-                                <td><?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></td>
+                                <?php if (has_role("Admin")) : ?>
+                                    <td><a class="link-success" href="profile.php?id=<?php se($order,"user_id");?>">@<?php se($order,"username") ?></a> <?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></td>
+                                <?php else : ?>
+                                    <td><?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></td>
+                                <?php endif; ?>
                                 <td><?php se($order,"payment_method"); ?></td>
                                 <td>$<?php se($order,"total_price"); ?></td>
                             </tr>
