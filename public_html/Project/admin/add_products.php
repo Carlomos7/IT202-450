@@ -4,7 +4,7 @@ require(__DIR__ . "/../../../partials/nav.php");
 $TABLE_NAME = "Products";
 if (!has_role("Admin")) {
     flash("You don't have permission to view this page", "warning");
-    die(header("Location: $BASE_PATH/home.php"));
+    redirect("$BASE_PATH" . "/home.php");
 }
 if (isset($_POST["submit"])) {
     $id = save_data($TABLE_NAME, $_POST);
