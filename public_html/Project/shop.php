@@ -113,6 +113,7 @@ $db = getDB();
         <div class="input-group mb-3">
             <input class="form-control" type="search" name="searchShop" placeholder="Search Shop" value="<?php se($name); ?>"/>  
             <select class="form-select bg-success" aria-label="Default select example" name="cat" value="<?php se($category); ?>" data="took">
+                <option selected>Choose Category</option>
                 <?php foreach($reCat as $cat) : ?>
                 <option value="<?php se($cat,"category"); ?>"><?php se($cat,"category"); ?></option>
                 <?php endforeach; ?>

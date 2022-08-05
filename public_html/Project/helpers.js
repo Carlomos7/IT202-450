@@ -45,6 +45,10 @@ function isValidPassword (password) {
     }
     return password.length >= 8;
 }
+function isValidZip (zip){
+    const pattern = /(^\d{5}$)|(^\d{5}-\d{4}$)/;
+    return pattern.test(zip);
+}
 function isEqual (a, b) {
     return a === b;
 }
