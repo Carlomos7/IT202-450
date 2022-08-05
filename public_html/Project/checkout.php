@@ -157,7 +157,7 @@ json_encode($response);
 
 
 //Fetching cart items for purchase summary. Product cost is pulled from products table
-$query = "SELECT cart.id, cart.product_id, product.stock, product.name, product.cost, (product.cost * cart.desired_quantity) as subtotal, cart.desired_quantity
+$query = "SELECT cart.id, cart.product_id, product.stock, product.name, product.cost, cart.unit_price, (product.cost * cart.desired_quantity) as subtotal, cart.desired_quantity
 FROM Products as product JOIN Cart_Alt as cart on product.id = cart.product_id
  WHERE cart.user_id = :uid";
 $db = getDB();
@@ -292,7 +292,19 @@ try {
         <?php foreach ($cart as $c) : ?>
             <tr>
                 <td><a class="link-success" href="product_details.php?id=<?php se($c,"product_id");?>"><?php se($c, "name"); ?></a></td>
-                <td>$<?php se($c, "cost"); ?></td>
+                <?php 
+                $percentage="";
+                if((int)se($c, "unit_price",0,false)!=(int)se($c, "cost",0,false)){
+                $original= (int)se($c, "unit_price",0,false);
+                $current = (int)se($c, "cost",0,false);
+                $diff = $current - $original;
+                $more_less = $diff > 0 ? "▲" : "▼";
+                $diff = abs($diff);
+                $percentChange = ($diff/$original)*100;
+                $percentage .= "$percentChange% $more_less";
+                }
+                ?>
+                <td>$<?php se($c, "unit_price"); ?> <span style="color:green"><?php se($percentage);?></span></td>
                 <td><?php se($c, "desired_quantity"); ?></td>
                 <?php $total += (int)se($c, "subtotal", 0, false); ?>
                 <td>$<?php se($c, "subtotal"); ?></td>
