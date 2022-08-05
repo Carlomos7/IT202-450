@@ -23,6 +23,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
     $lastname= se($_POST,"lastName","",false);
     $user_payment+= (int)se($_POST,"amount","",false);
     //phpvalidation
+    //cs525 8/4/2022
     $hasError = false;
     if(!$address){
       flash("Please fill out address","warning");
@@ -87,7 +88,10 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                       $stmt->execute([":uid" => $user_id]);
                       $check=$stmt->fetchAll(PDO::FETCH_ASSOC);
                       foreach($check as $record){
-                        if((int)se($record,"stock",0,false)<(int)se($record,"desired_quantity",0,false)){
+                        if((int)se($record,"stock",0,false)== 0){
+                          flash(se($record,"name",0,false). "is out of stock","danger");
+                        }
+                        else if((int)se($record,"stock",0,false)<(int)se($record,"desired_quantity",0,false)){
                           flash(se($record,"name",0,false)." has only ".se($record,"stock",0,false)." in stock","danger");
                         }                      
                       }
@@ -336,7 +340,7 @@ try {
   </div>
 </div>
 <script>
-  function validate(form){
+  function validate(form){ //cs525 8/4/2022
     let isValid=true;
 
     let paymethod = form.payMethod.value;
