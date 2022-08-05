@@ -72,7 +72,10 @@ function map_column($col)
                             <tr>
                                 <td><?php se($order,"created"); ?></td>
                                 <?php if (has_role("Admin")) : ?>
-                                    <td><a class="link-success" href="profile.php?id=<?php se($order,"user_id");?>">@<?php se($order,"username") ?></a> <?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></td>
+                                    <td><?php $user_id=se($order,"user_id",0,false); 
+                                    $username=se($order,"username","",false); 
+                                    include(__DIR__ . "/../../partials/profile_link.php"); ?>
+                                    <span> <?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></span></td>
                                 <?php else : ?>
                                     <td><?php se($order,"first_name"); ?> <?php se($order,"last_name"); ?></td>
                                 <?php endif; ?>
