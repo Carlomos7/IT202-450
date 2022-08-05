@@ -133,7 +133,7 @@ if (isset($_POST["purchase"])) { //users submits form data by clicking purchase
                 http_response_code(200);
                 $response["message"] = "Purchase complete";
                 flash("Purchase complete!","success");
-                die(header("Location: $BASE_PATH/order_confirmation.php?id=$next_order_id"));
+                redirect("$BASE_PATH" ."/order_confirmation.php?id=$next_order_id");
                 
 
             } else {
@@ -179,7 +179,7 @@ try {
 }
 /*if (count($cart) == 0){
   flash("There are no items in your cart", "warning");
-  die(header("Location: $BASE_PATH/shop.php"));
+  redirect("$BASE_PATH/shop.php");
 }*/
 
 
