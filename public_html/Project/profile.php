@@ -96,12 +96,29 @@ try {
     //echo "<pre>" . var_export($e->errorInfo, true) . "</pre>";
 }
 
-//select ratings
-$query = "SELECT R.id, R.product_id, R.user_id, P.name, R.rating, R.comment, R.created FROM Ratings as R INNER JOIN Products as P on P.id = R.product_id where R.user_id = :uid";
-$stmt = $db->prepare($query);
+//fetch ratings
 $ratings = [];
+//Spit query into data and total
+$base_query = "SELECT R.id, R.product_id, R.user_id, P.name, R.rating, R.comment, R.created FROM Ratings as R INNER JOIN Products as P on P.id = R.product_id ";
+$total_query = "SELECT count(1) as total FROM Ratings R ";
+$query = "where R.user_id = :uid";
+$params = [":uid" => $user_id];
+$per_page = 5;
+paginate($total_query . $query, $params, $per_page);
+$query .= " LIMIT :offset, :count";
+$params[":offset"] = $offset;
+$params[":count"] = $per_page;
+//get the records
+$stmt = $db->prepare($base_query . $query);
+//we'll want to convert this to use bindValue so ensure they're integers so lets map our array
+foreach ($params as $key => $value) {
+    $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+    $stmt->bindValue($key, $value, $type);
+}
+$params = null; //set it to null to avoid issues
+
 try{
-    $stmt->execute([":uid" => $user_id]);
+    $stmt->execute($params);
     $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if ($r) {
         $ratings = $r;
@@ -203,7 +220,7 @@ try{
 								<div class="col-lg-8">
 									<h5 class="text-muted fw-light mb-4"><?php se($r,"comment"); ?></h5>
 									<h4>Rating: <span class="fw-bold text-muted mb-0"><?php se($r,"rating") ?>/5</span></h4>
-									<p class="fw-bold lead mb-2"><a class="link-success" href="product_details.php?id=<?php se($r,"id");?>"> <?php se($r, "name"); ?></a></p>
+									<p class="fw-bold lead mb-2"><a class="link-success" href="product_details.php?id=<?php se($r,"product_id");?>"> <?php se($r, "name"); ?></a></p>
 									<p class="fw-bold text-muted mb-0"><?php se($r,"created") ?></p>
 								</div>
 							</div>
@@ -213,6 +230,7 @@ try{
 			<?php endforeach; ?>
 		</div>
 	</div>
+    <?php require(__DIR__ . "/../../partials/pagination.php"); ?>
 </section>
     </div>
 <?php else : ?>
