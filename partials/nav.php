@@ -53,7 +53,7 @@ session_start();
                 <?php if (has_role("Admin")) : ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" id="nav-item" href="#" name="rolesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Admin Roles</a>
-                        <ul class="dropdown-menu bg-success" aria-labelledby="rolesDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="rolesDropdown">
                             <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('admin/create_role.php'); ?>">Create</a></li>
                             <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('admin/list_roles.php'); ?>">List</a></li>
                             <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('admin/assign_roles.php'); ?>">Assign</a></li>
@@ -61,14 +61,23 @@ session_start();
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" name="productsDropdown" id="nav-item" role="button" data-bs-toggle="dropdown" aria-expanded="false">Products</a>
-                        <ul class="dropdown-menu bg-success" aria-labelledby="productsDropdown">
+                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
                             <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('admin/add_products.php'); ?>">Sell</a></li>
                             <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('admin/list_products.php'); ?>">List</a></li>
                         </ul>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" name="productsDropdown" id="nav-item" role="button" data-bs-toggle="dropdown" aria-expanded="false">Orders</a>
+                        <ul class="dropdown-menu" aria-labelledby="productsDropdown">
+                            <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('admin/all_purchase_history.php'); ?>">All Orders</a></li>
+                            <li><a id="nav-item" class="dropdown-item" href="<?php echo get_url('purchase_history.php'); ?>">Your Orders</a></li>
+                        </ul>
+                    </li>
                 <?php endif; ?>
                 <?php if (is_logged_in()) : ?>
-                    <li class="nav-item"><a id="nav-item" class="nav-link" href="<?php echo get_url('purchase_history.php'); ?>">Purchase History</a></li>
+                    <?php if(!has_role("Admin")) : ?>
+                    <li class="nav-item"><a id="nav-item" class="nav-link" href="<?php echo get_url('purchase_history.php'); ?>">Your Orders</a></li>
+                    <?php endif; ?>
                     <li class="nav-item"><a id="nav-item" class="nav-link" href="<?php echo get_url('logout.php'); ?>">Logout</a></li>
                     <li class="nav-item"><a id="nav-item" class="nav-link" href="<?php echo get_url('cart.php'); ?>">Cart ($)</a></li>
                 <?php endif; ?>

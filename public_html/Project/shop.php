@@ -7,7 +7,6 @@ $db = getDB();
 //process filters/sorting
 //Sort and Filters
 $col = se($_GET, "col", "cost", false);
-$c = se($_GET,"c","Choose Category",false);
 //allowed list
 if (!in_array($col, ["cost", "stock", "name", "created"])) {
     $col = "cost"; //default value, prevent sql injection
@@ -20,7 +19,13 @@ if (!in_array($order, ["asc", "desc"])) {
 //get name partial search
 $name = se($_GET, "searchShop", "", false);
 //category
-$category = se($_GET,"cat","",false);
+$category = "";
+if(isset($_GET["c"])){
+    $category = se($_GET,"c","",false);    
+}else{
+    $category.="Choose Category";
+}
+
 //Split query into data and total
 $base_query = "SELECT id, name, description, category, stock, cost, image FROM Products products";
 $total_query = "SELECT count(1) as total FROM Products products";
@@ -35,7 +40,7 @@ if (!empty($name)) {
     $query .= " AND name like :name";
     $params[":name"] = "%$name%";
 }
-if(!empty($category)){
+if(!empty($category) && $category!="Choose Category"){
     $query .= " AND category like :category";
     $params[":category"] = "$category";
 }
@@ -122,7 +127,7 @@ $db = getDB();
             <script>
                     //quick fix to ensure proper value is selected since
                     //value setting only works after the options are defined and php has the value set prior
-                    document.forms[0].c.value = "<?php se($c); ?>";
+                    document.forms[0].c.value = "<?php se($category); ?>";
             </script>
             
             <!-- sorting -->
@@ -178,14 +183,14 @@ $db = getDB();
                 <div class="col">
                     <div class="card bg-light">
                         <div class="card-header">
-                            <?php se($product,"category");?>
+                            <h6><?php se($product,"category");?></h6>
                         </div>
                         <?php if (se($product, "image", "", false)) : ?>
                             <img src="<?php se($product, "image"); ?>" class="card-img-top" alt="...">
                         <?php endif; ?>
 
                         <div class="card-body">
-                            <h5><a class="link-success" href="product_details.php?id=<?php se($product,"id");?>"> <?php se($product, "name"); ?></a></h5>
+                            <h5><a class="link" href="product_details.php?id=<?php se($product,"id");?>"> <?php se($product, "name"); ?></a></h5>
                             <p class="card-text">Description: <?php se($product, "description"); ?></p>
                         </div>
                         <div class="card-footer">
@@ -194,7 +199,7 @@ $db = getDB();
                                 <input type="hidden" name="product_id" value="<?php se($product, "id");?>"/>
                                 <input type="hidden" name="action" value="add"/>
                                 <input type="number" name="desired_quantity" value="1" min="1" max="<?php se($product, "stock");?>"/>
-                                <input type="submit" style="background-color:rgb(4, 144, 64);color:white;" class="btn" value="Add to Cart"/>
+                                <input type="submit" id="blue-button" class="btn" value="Add to Cart"/>
                                 <?php if (has_role("Admin")) : ?>
 									<a type= "button" class="btn btn-danger" href="admin/edit_products.php?id=<?php se($product, "id"); ?>">Edit</a>
 								<?php endif; ?>
