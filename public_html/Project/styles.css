@@ -19,9 +19,22 @@
 }
 nav li{display: inline; background-color: rgb(4, 144, 64);}
 nav li a{color: black}
+#nav-item{color:white}
 input{border-radius: 5%;}
 body{
     background-color: rgb(220, 220, 220);
     color: rgb(4, 144, 64);
 
 }
+#rating{
+    width: 600px;
+    -webkit-appearance: none;
+}
+#rating::-webkit-slider-thumb {
+    background-color: rgb(4, 144, 64);
+}
+#rating::-webkit-slider-runnable-track{
+    background-color: lightgreen;
+}
+
+  
