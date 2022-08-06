@@ -7,6 +7,7 @@ $db = getDB();
 //process filters/sorting
 //Sort and Filters
 $col = se($_GET, "col", "cost", false);
+$c = se($_GET,"c","Choose Category",false);
 //allowed list
 if (!in_array($col, ["cost", "stock", "name", "created"])) {
     $col = "cost"; //default value, prevent sql injection
@@ -112,8 +113,8 @@ $db = getDB();
     <form class="row row-cols-lg-auto g-3 align-items-center">
         <div class="input-group mb-3">
             <input class="form-control" type="search" name="searchShop" placeholder="Search Shop" value="<?php se($name); ?>"/>  
-            <select class="form-select bg-success" aria-label="Default select example" name="cat" value="<?php se($category); ?>" data="took">
-                <option selected>Choose Category</option>
+            <select style="color:white;background-color:rgb(4, 144, 64);" class="form-select" aria-label="Default select example" name="c" value="<?php se($category); ?>" data="took">
+                <option disabled>Choose Category</option>
                 <?php foreach($reCat as $cat) : ?>
                 <option value="<?php se($cat,"category"); ?>"><?php se($cat,"category"); ?></option>
                 <?php endforeach; ?>
@@ -121,7 +122,7 @@ $db = getDB();
             <script>
                     //quick fix to ensure proper value is selected since
                     //value setting only works after the options are defined and php has the value set prior
-                    document.forms[0].cat.value = "Choose Category";
+                    document.forms[0].c.value = "<?php se($c); ?>";
             </script>
             
             <!-- sorting -->
@@ -129,7 +130,7 @@ $db = getDB();
             <div class="input-group">
                 <div class="input-group-text">Sort</div>
                 <!-- make sure these match the in_array filter above-->
-                <select class="form-select bg-success" aria-label="Default select example" name="col" value="<?php se($col); ?>" data="took">
+                <select style="color:white;background-color:rgb(4, 144, 64);" class="form-select" aria-label="Default select example" name="col" value="<?php se($col); ?>" data="took">
                     <option value="cost">Cost</option>
                     <option value="stock">Stock</option>
                     <option value="name">Name</option>
@@ -140,7 +141,7 @@ $db = getDB();
                     //value setting only works after the options are defined and php has the value set prior
                     document.forms[0].col.value = "<?php se($col); ?>";
                 </script>
-                <select class="form-select bg-success" aria-label="Default select example" name="order" value="<?php se($order); ?>">
+                <select style="color:white;" class="form-select" aria-label="Default select example" name="order" value="<?php se($order); ?>">
                     <option <?php //se($order === "asc" ? "selected" : "");?> value="asc">Up</option>
                     <option <?php //se($order === "desc" ? "selected" : "");?> value="desc">Down</option>
                 </select>
@@ -149,9 +150,9 @@ $db = getDB();
                     //value setting only works after the options are defined and php has the value set prior
                     document.forms[0].order.value = "<?php se($order); ?>";
                     if (document.forms[0].order.value === "asc") {
-                        document.forms[0].order.className = "form-select bg-success";
+                        document.forms[0].order.style = "color:cyan;background-color:rgb(4, 144, 64);";
                     } else {
-                        document.forms[0].order.className = "form-select bg-danger";
+                        document.forms[0].order.style = "color:red;background-color:rgb(4, 144, 64);";
                     }
                 </script>
             </div>
@@ -161,12 +162,12 @@ $db = getDB();
 
         <div class="col">
             <div class="input-group">
-                <input type="submit" class="btn btn-primary" value="Apply" />
+                <input style="background-color:rgb(4, 144, 64);font-weight: bold;" type="submit" class="btn btn-primary" value="Apply" />
             </div>
         </div>
         </div>
     </form>
-    <h3>Recently added</h3>
+    <h3 style="color:white;background-color:rgb(4, 144, 64);">Recently added</h3>
     <?php if (count($results) == 0) : ?>
         <p>No results to show</p>
 
@@ -193,7 +194,7 @@ $db = getDB();
                                 <input type="hidden" name="product_id" value="<?php se($product, "id");?>"/>
                                 <input type="hidden" name="action" value="add"/>
                                 <input type="number" name="desired_quantity" value="1" min="1" max="<?php se($product, "stock");?>"/>
-                                <input type="submit" class="btn btn-primary" value="Add to Cart"/>
+                                <input type="submit" style="background-color:rgb(4, 144, 64);color:white;" class="btn" value="Add to Cart"/>
                                 <?php if (has_role("Admin")) : ?>
 									<a type= "button" class="btn btn-danger" href="admin/edit_products.php?id=<?php se($product, "id"); ?>">Edit</a>
 								<?php endif; ?>

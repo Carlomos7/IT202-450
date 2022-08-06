@@ -59,7 +59,7 @@ if (isset($_POST["save"])) {
 
                         flash("Password reset", "success");
                     } else {
-                        flash("Current password is invalid", "warning");
+                        flash("Current password is invalid", "succes");
                     }
                 }
             } catch (Exception $e) {
@@ -95,6 +95,21 @@ try {
     flash("An unexpected error occurred, please try again", "danger");
     //echo "<pre>" . var_export($e->errorInfo, true) . "</pre>";
 }
+
+//select ratings
+$query = "SELECT R.id, R.product_id, R.user_id, P.name, R.rating, R.comment, R.created FROM Ratings as R INNER JOIN Products as P on P.id = R.product_id where R.user_id = :uid";
+$stmt = $db->prepare($query);
+$ratings = [];
+try{
+    $stmt->execute([":uid" => $user_id]);
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($r) {
+        $ratings = $r;
+    }
+} catch (PDOException $e) {
+    error_log(var_export($e, true));
+    flash("Error fetching ratings", "danger");
+}
 ?>
 
 
@@ -102,9 +117,6 @@ try {
     <h1>Profile</h1>
 
     <?php if ($isMe && $isEdit) : ?>
-        <?php if ($isMe) : ?>
-            <a class="btn btn-success btn" role="button" href="<?php echo get_url("profile.php"); ?>">View</a>
-        <?php endif; ?>
     <form method="POST" onsubmit="return validate(this);">
         <div class="mb-3">
             <label class="form-label" for="email">Email</label>
@@ -136,29 +148,80 @@ try {
             <label class="form-label" for="conp">Confirm Password</label>
             <input class="form-control" type="password" name="confirmPassword" id="conp" />
         </div>
-        <input type="submit" class="mt-3 btn btn-success" value="Update Profile" name="save" />
-    </form>
+        <div>
+        <table>
+            <tr>
+                <td><input type="submit" class="btn btn-success" value="Save Changes" name="save" /></td>
+                <?php if ($isMe) : ?>
+                    <td><a class="btn btn-success btn" role="button" href="<?php echo get_url("profile.php"); ?>">View Profile</a></td>
+                <?php endif; ?>
+            </tr>
+        </table>
+        </div>
     <?php else : ?>
-        <?php if ($isMe) : ?>
-            <a class="btn btn-success btn" role="button" href="?edit">Edit</a>
-        <?php endif; ?>
-        <?php if ($isVisible || $isMe) : ?>
-            TODO: Define your visible profile
+    </form>
+<?php if ($isVisible || $isMe) : ?>
+    <div class="container">
+    <div class="row d-flex justify-content-center">
+    <div class="col-md-7">
+            <div class="card p-3 py-4">
+                <div class="text-center">
+                    <img src="" width="100" class="rounded-circle">
+                </div>
 
-            This is <?php se($username); ?>
-            <div>
-                Joined: <?php se($joined); ?>
+                <div class="text-center mt-3">
+
+                    <h5 class="mt-2 mb-0">@<?php se($username); ?></h5>
+                    <span>Joined: <?php se($joined); ?></span>
+                    
+                    <div class="buttons">
+                        <?php if ($isMe) : ?>
+                            <a class="btn btn-success btn" role="button" href="?edit">Edit Profile</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
             </div>
-            <div>
-                <h3>Maybe ratings</h3>
-            </div>
-        <?php else : ?>
-            Profile is private
-            <?php
-            flash("Profile is private", "warning");
-            redirect("home.php");
-            ?>
-        <?php endif; ?>
+        </div>
+    </div>
+    </div>
+
+    <div>
+    <section class="p-4 p-md-5 text-center text-lg-start shadow-1-strong rounded">
+	<div class="container">
+	<h1>Reviews</h1>
+		<div class="row d-flex justify-content-center">
+			<?php foreach($ratings as $r) : ?>
+				<div class="col-md-10">
+					<div class="card">
+						<div class="card-body m-3">
+							<div class="row">
+								<div class="col-lg-4 d-flex justify-content-center align-items-center mb-4 mb-lg-0">
+									<img src=""
+										class="rounded-circle img-fluid shadow-1" alt="" width="200" height="200" />
+								</div>
+								<div class="col-lg-8">
+									<h5 class="text-muted fw-light mb-4"><?php se($r,"comment"); ?></h5>
+									<h4>Rating: <span class="fw-bold text-muted mb-0"><?php se($r,"rating") ?>/5</span></h4>
+									<p class="fw-bold lead mb-2"><a class="link-success" href="product_details.php?id=<?php se($r,"id");?>"> <?php se($r, "name"); ?></a></p>
+									<p class="fw-bold text-muted mb-0"><?php se($r,"created") ?></p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<?php endforeach; ?>
+		</div>
+	</div>
+</section>
+    </div>
+<?php else : ?>
+    Profile is private
+    <?php
+    flash("Private profile", "warning");
+    redirect("shop.php");
+    ?>
+<?php endif; ?>
 </div>
 <?php endif; ?>
 
@@ -182,15 +245,16 @@ try {
             flash("Username must only contain 3-16 characters a-z, 0-9, _, or -","warning");
             isValid = false;
         }
-        if(!isValidPassword(current)){
-            flash("Current password is invalid","warning");
+        
+        if(current && !isValidPassword(current)){
+            flash("Current password is invalid","info");
             isValid = false;
         }
-        if(!isValidPassword(newPass)){
+        if(newPass && !isValidPassword(newPass)){
             flash("New password must be a minimum of eight characters", "warning");
             isValid = false;
         }
-        if(newPass && !isEqual(newPass,confirm)){
+        if(confirm && !isEqual(newPass,confirm)){
             flash("New passwords must match","warning");
             isValid = false;
         }
