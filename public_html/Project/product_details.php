@@ -37,26 +37,6 @@ function map_column($col)
     }
     return "text";
 }
-
-//Ratings
-$query = "SELECT R.id, R.product_id, R.user_id, U.username, R.rating, R.comment, R.created, (SELECT AVG(rating) FROM Ratings where product_id = :id) as average FROM Ratings as R INNER JOIN Users as U on U.id = R.user_id where R.product_id = :id";
-$stmt = $db->prepare($query);
-$ratings = [];
-$average = 0;
-try{
-    $stmt->execute([":id" => $product_id]);
-    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if ($r) {
-        $ratings = $r;
-    }
-	foreach($ratings as $avg){
-		$average=se($avg,"average",0,false);
-		break;
-	}
-} catch (PDOException $e) {
-    error_log(var_export($e, true));
-    flash("Error fetching ratings", "danger");
-}
 //Inseting reviews into Ratings table
 if(isset($_POST["submitreview"])){
 	$rating = se($_POST,"rating",0,false);
@@ -99,6 +79,41 @@ if(isset($_POST["submitreview"])){
 			flash("Cannot upload more than one review", "danger");	
 		}
 	}
+}
+//Ratings
+$ratings = [];
+//Split query into data and total
+$base_query = "SELECT R.id, R.product_id, R.user_id, U.username, R.rating, R.comment, R.created, (SELECT AVG(rating) FROM Ratings where product_id = :id) as average FROM Ratings as R INNER JOIN Users as U on U.id = R.user_id ";
+$total_query = "SELECT count(1) as total FROM Ratings R ";
+$query = "where R.product_id = :id";
+$params=[":id" => $product_id];
+$per_page = 2;
+paginate($total_query . $query, $params, $per_page);
+$query .= " LIMIT :offset, :count";
+$params[":offset"] = $offset;
+$params[":count"] = $per_page;
+//get the records
+$stmt = $db->prepare($base_query . $query);
+//we'll want to convert this to use bindValue so ensure they're integers so lets map our array
+foreach ($params as $key => $value) {
+    $type = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+    $stmt->bindValue($key, $value, $type);
+}
+$params = null; //set it to null to avoid issues
+$average = 0;
+try{
+    $stmt->execute($params);
+    $r = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($r) {
+        $ratings = $r;
+    }
+	foreach($ratings as $avg){
+		$average=se($avg,"average",0,false);
+		break;
+	}
+} catch (PDOException $e) {
+    error_log(var_export($e, true));
+    flash("Error fetching ratings", "danger");
 }
 ?>
 
@@ -228,6 +243,7 @@ if(isset($_POST["submitreview"])){
 			<?php endforeach; ?>
 		</div>
 	</div>
+	<?php require(__DIR__ . "/../../partials/pagination.php"); ?>
 </section>
 <?php
 //note we need to go up 1 more directory
