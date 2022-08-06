@@ -1,8 +1,11 @@
 <?php
-require(__DIR__ . "/../../partials/nav.php");
+require(__DIR__ . "/../../../partials/nav.php");
 
 is_logged_in(true);
-
+if (!has_role("Admin")) {
+    flash("You don't have permission to view this page", "warning");
+    redirect("$BASE_PATH" . "/shop.php");
+}
 $user_id = get_user_id();
 $result = [];
 $db = getDB();
@@ -23,19 +26,21 @@ if (!in_array($ord, ["asc", "dsc"])) {
     $order = "asc"; //default value, prevent sql injection
 }
 //get filters
+//username partial match
+$user = se($_GET, "searchOrders", "", false);
 //range
-$range ="";
-if(isset($_GET["range"])){
-    $range = se($_GET, "range", "", false);    
-}else{
-    $range.="Date Range";
+$range = "";
+if (isset($_GET["range"])) {
+    $range = se($_GET, "range", "", false);
+} else {
+    $range .= "Date Range";
 }
 //category
 $category = "";
-if(isset($_GET["category"])){
-    $category = se($_GET,"category","",false);    
-}else{
-    $category.="Choose Category";
+if (isset($_GET["category"])) {
+    $category = se($_GET, "category", "", false);
+} else {
+    $category .= "Choose Category";
 }
 
 /*"SELECT O.id, O.user_id, O.total_price, O.payment_method, O.money_recieved, O.first_name, O.last_name, O.created, U.username FROM Orders as O 
@@ -47,10 +52,14 @@ OP.unit_price, (OP.desired_quantity * OP.unit_price) as subtotal, O.total_price 
 INNER JOIN Products as P on P.id = OP.product_id INNER JOIN Users as U on U.id = O.user_id";
 $total_query = "SELECT count(1) as total FROM Orders O";
 //dynamic query
-$query = " WHERE O.user_id = :uid";
+$query = " WHERE O.user_id != :uid";
 $params = [":uid" => $user_id]; //default params
 //apply category filter
-if (!empty($category) && $category!="Choose Category") {
+if (!empty($user)) {
+    $query .= " AND U.username LIKE :username";
+    $params[":username"] = "%$user%";
+}
+if (!empty($category) && $category != "Choose Category") {
     $query .= " AND P.category like :category";
     $params[":category"] = "$category";
 }
@@ -100,36 +109,49 @@ try {
     error_log(var_export($e, true));
     flash("Error fetching categories", "warning");
 }
+$total = 0;
+foreach ($result as $mo) {
+    $total += se($mo, "total_price", 0, false);
+}
 ?>
 <script src="<?php echo get_url('helpers.js'); ?>"></script>
-<h1>Your Orders</h1>
+<h1>All Orders</h1>
 <?php if (count($result) == 0) : ?>
     <h4>No purchase history to show.</h4>
 <?php endif; ?>
 <script src="<?php echo get_url('helpers.js'); ?>"></script>
 <div class="container mt-5 mb-5">
     <form class="row row-cols-lg-auto g-3 align-items-center">
-        <div class="input-group mb-3"> 
-        <div class="input-group-text">Filter</div>
+        <div class="input-group mb-3">
+            <input class="form-control" type="search" name="searchOrders" placeholder="Search for Username" value="" />
+            <div class="input-group-text">Filter</div>
             <select style="color:white;background-color:rgb(4, 144, 64);" class="form-select" aria-label="Default select example" name="category" value="<?php se($category); ?>" data="took">
                 <option disabled>Choose Category</option>
-                <?php foreach($reCat as $cat) : ?>
-                <option value="<?php se($cat,"category"); ?>"><?php se($cat,"category"); ?></option>
+                <?php foreach ($reCat as $cat) : ?>
+                    <option value="<?php se($cat, "category"); ?>"><?php se($cat, "category"); ?></option>
                 <?php endforeach; ?>
             </select>
             <script>
-                    //quick fix to ensure proper value is selected since
-                    //value setting only works after the options are defined and php has the value set prior
-                    document.forms[0].category.value = "<?php se($category); ?>";
+                //quick fix to ensure proper value is selected since
+                //value setting only works after the options are defined and php has the value set prior
+                document.forms[0].category.value = "<?php se($category); ?>";
             </script>
 
             <select style="color:white;background-color:rgb(4, 144, 64);" class="form-select" aria-label="Default select example" name="range" value="<?php se($range); ?>" data="took">
                 <option disabled>Date Range</option>
                 <option value="<?php echo date('Y-m-d'); ?>">Today</option>
-                <option value="<?php $date= new DateTime(date('Y-m-d')); $date->modify("-1 day"); echo $date->format("Y-m-d"); ?>">Yesterday</option>
-                <option value="<?php $date= new DateTime(date('Y-m-d')); $date->modify("-2 day"); echo $date->format("Y-m-d"); ?>">Two Days Ago</option>
-                <option value="<?php $date= new DateTime(date('Y-m-d')); $date->modify("-5 day"); echo $date->format("Y-m-d"); ?>">5 Days Ago</option>
-                <option value="<?php $date= new DateTime(date('Y-m-d')); $date->modify("-7 day"); echo $date->format("Y-m-d"); ?>">1 Week Ago</option>
+                <option value="<?php $date = new DateTime(date('Y-m-d'));
+                                $date->modify("-1 day");
+                                echo $date->format("Y-m-d"); ?>">Yesterday</option>
+                <option value="<?php $date = new DateTime(date('Y-m-d'));
+                                $date->modify("-2 day");
+                                echo $date->format("Y-m-d"); ?>">Two Days Ago</option>
+                <option value="<?php $date = new DateTime(date('Y-m-d'));
+                                $date->modify("-5 day");
+                                echo $date->format("Y-m-d"); ?>">5 Days Ago</option>
+                <option value="<?php $date = new DateTime(date('Y-m-d'));
+                                $date->modify("-7 day");
+                                echo $date->format("Y-m-d"); ?>">1 Week Ago</option>
             </select>
             <script>
                 //quick fix to ensure proper value is selected since
@@ -171,25 +193,27 @@ try {
             </div>
             <div class="col">
                 <div class="input-group">
-                    <input style="background-color:rgb(4, 144, 64);font-weight: bold;" type="submit" class="btn btn-primary" value="Apply" />
+                    <input style="background-color:rgb(4, 144, 64);" type="submit" class="btn btn-primary" value="Apply" />
+                    
                 </div>
             </div>
         </div>
     </form>
     <div class="row d-flex justify-content-center">
+    <div class="input-group-text" style="background-color:rgb(4, 144, 64);color:white;"><b>Total Amount: </b> $<?php se($total) ?></div>
         <?php foreach ($result as $order) : ?>
             <div class="card">
                 <div></div>
                 <div class="card-body">
                     <div class="card-title">
-                        <h5><a class="link-success" href="order_details.php?id=<?php se($order, "id"); ?>">Order No: <?php se($order, "id"); ?><a></h5>
+                        <h5><a class="link-success" href="<?php echo get_url("order_details.php") . "?id=" . se($order, "id", 0, false); ?>">Order No: <?php se($order, "id"); ?><a></h5>
                         <table class="table table-borderless">
                             <thead>
                                 <tr>
-                                    <td class="text-muted">Order Placed</td>
-                                    <td class="text-muted">Ship to</td>
-                                    <td class="text-muted">Payment Method</td>
-                                    <td class="text-muted">Total</td>
+                                    <th class="text-muted">Order Placed</th>
+                                    <th class="text-muted">Name for Order</th>
+                                    <th class="text-muted">Payment Method</th>
+                                    <th class="text-muted">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -198,7 +222,7 @@ try {
                                     <?php if (has_role("Admin")) : ?>
                                         <td><?php $user_id = se($order, "user_id", 0, false);
                                             $username = se($order, "username", "", false);
-                                            include(__DIR__ . "/../../partials/profile_link.php"); ?>
+                                            include(__DIR__ . "/../../../partials/profile_link.php"); ?>
                                             <span> <?php se($order, "first_name"); ?> <?php se($order, "last_name"); ?></span>
                                         </td>
                                     <?php else : ?>
@@ -219,6 +243,6 @@ try {
 </div>
 
 <?php
-require(__DIR__ . "/../../partials/pagination.php");
-require(__DIR__ . "/../../partials/flash.php");
+require(__DIR__ . "/../../../partials/pagination.php");
+require(__DIR__ . "/../../../partials/flash.php");
 ?>
