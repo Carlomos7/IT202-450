@@ -74,10 +74,19 @@ if(isset($_POST["submitreview"])){
 		try{
 			$stmt->execute([":product_id" => $product_id,":user_id" => get_user_id(), ":rating" => $rating, ":comment" => $comment]);
 			flash("Review uploaded!","success");
+			$query = "UPDATE Products SET Products.average_rating = (SELECT AVG(Ratings.rating) FROM Ratings where Ratings.product_id = Products.id) where Products.id = :product_id"; 
+			$stmt = $db->prepare($query);
+			try{
+				$stmt->execute([":product_id" => $product_id]);
+			}catch (PDOException $e){
+				error_log(var_export($e, true));
+				flash("Error updating product rating average ", "danger");	
+			}
 		}catch (PDOException $e){
 			error_log(var_export($e, true));
 			flash("Cannot upload more than one review", "danger");	
 		}
+		
 	}
 }
 //Ratings
@@ -214,6 +223,7 @@ try{
 		return isValid;
 	}
 </script>
+<?php if($ratings): ?>
 <section class="p-4 p-md-5 text-center text-lg-start shadow-1-strong rounded" style="
     background-color:rgb(4, 144, 64)">
 	<div class="container">
@@ -245,6 +255,7 @@ try{
 	</div>
 	<?php require(__DIR__ . "/../../partials/pagination.php"); ?>
 </section>
+<?php endif; ?>
 <?php
 //note we need to go up 1 more directory
 require_once(__DIR__ . "/../../partials/flash.php");
