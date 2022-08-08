@@ -28,51 +28,64 @@ if (!in_array($ord, ["asc", "dsc"])) {
 //get filters
 //username partial match
 $user = se($_GET, "searchOrders", "", false);
-//range
-$range = "";
-if (isset($_GET["range"])) {
-    $range = se($_GET, "range", "", false);
-} else {
-    $range .= "Date Range";
-}
-//category
-$category = "";
-if (isset($_GET["category"])) {
-    $category = se($_GET, "category", "", false);
-} else {
-    $category .= "Choose Category";
-}
+//Date Range
+$default_date = date("Y-m-d", strtotime('1970-01-01'));
+$fromdate = 0;
 
+$to_date = 0;//holder
+
+if(isset($_GET["fromdate"])){
+    if(se($_GET, "fromdate", 0, false) != 0){
+        $fromdate = date("Y-m-d", strtotime(se($_GET, "fromdate", "", false)));
+        if($fromdate===$default_date){
+            $fromdate = 0;
+        }
+    }
+}
+$todate = 0;
+if(isset($_GET["todate"])){
+    if(se($_GET, "todate", 0, false)!=0){
+        $todate = date("Y-m-d", strtotime(se($_GET, "todate", "", false)."+1 day"));
+        $to_date = date("Y-m-d", strtotime(se($_GET, "todate", "", false))); //holder
+        if($todate===$default_date){
+            $todate=0;
+            $to_date=0;
+        }
+    }
+}
+$range = $fromdate . $todate;
 /*"SELECT O.id, O.user_id, O.total_price, O.payment_method, O.money_recieved, O.first_name, O.last_name, O.created, U.username FROM Orders as O 
 INNER JOIN Users as U on U.id = O.user_id WHERE O.user_id =:uid"*/
 
 //split query into data and total
-$base_query = "SELECT O.id, O.user_id, U.username, P.category, O.first_name, O.last_name, O.created, O.payment_method, O.money_recieved, O.user_address, OP.product_id, OP.desired_quantity, P.name,
-OP.unit_price, (OP.desired_quantity * OP.unit_price) as subtotal, O.total_price FROM OrderProducts as OP INNER JOIN Orders as O on O.id = OP.order_id 
-INNER JOIN Products as P on P.id = OP.product_id INNER JOIN Users as U on U.id = O.user_id";
+$base_query = "SELECT O.id, O.user_id, O.total_price, O.payment_method, O.money_recieved, O.first_name, 
+O.last_name, O.created, U.username FROM Orders as O JOIN Users as U on U.id = O.user_id";
 $total_query = "SELECT count(1) as total FROM Orders O";
 //dynamic query
 $query = " WHERE O.user_id != :uid";
-$params = [":uid" => $user_id]; //default params
-//apply category filter
+$params = [":uid"=>$user_id]; //default params
+//apply filter
 if (!empty($user)) {
     $query .= " AND U.username LIKE :username";
     $params[":username"] = "%$user%";
 }
-if (!empty($category) && $category != "Choose Category") {
-    $query .= " AND P.category like :category";
-    $params[":category"] = "$category";
-}
-if (!empty($range) && $range != "Date Range") {
-    $query .= " AND DATE(O.created) = :daterange";
-    $params[":daterange"] = "$range";
+if ($range !== "00") {
+    if (!empty($fromdate) && $to_date=== $default_date) {
+        $query .= " AND DATE(O.created) = :fromdate";
+        $params[":fromdate"] = "$fromdate";
+    }
+    if (!empty($fromdate) && !empty($todate)) {
+        $query .= " AND O.created >= :fromdate AND DATE(O.created) < :todate";
+        $params[":fromdate"] = "$fromdate";
+        $params[":todate"] = "$todate";
+    }
 }
 //apply column and order sort
 if (!empty($col) && !empty($ord)) {
     $query .= " ORDER BY $col $ord"; //be sure you trust these values, I validate via the in_array checks above
 }
 //paginate function
-$per_page = 5;
+$per_page = 10;
 paginate($total_query . $query, $params, $per_page);
 $query .= " LIMIT :offset, :count";
 $params[":offset"] = $offset;
@@ -125,34 +138,14 @@ foreach ($result as $mo) {
         <div class="input-group mb-3">
             <input class="form-control" type="search" name="searchOrders" placeholder="Search for Username" value="" />
             <div class="input-group-text">Filter</div>
-            <select style="color:white;background-color:rgb(4, 144, 64);" class="form-select" aria-label="Default select example" name="category" value="<?php se($category); ?>" data="took">
-                <option disabled>Choose Category</option>
-                <?php foreach ($reCat as $cat) : ?>
-                    <option value="<?php se($cat, "category"); ?>"><?php se($cat, "category"); ?></option>
-                <?php endforeach; ?>
-            </select>
+            <div class="input-group-text" style="color:white;background-color:rgb(4, 144, 64);">From</div>
+            <input class="form-control" type="date" name="fromdate" value="<?php se($fromdate) ?>" />
+            <div class="input-group-text" style="color:white;background-color:rgb(4, 144, 64);">To</div>
+            <input class="form-control" type="date" name="todate" value="<?php echo ($to_date===$default_date? 0 :$to_date ); ?>" />
             <script>
-                //quick fix to ensure proper value is selected since
-                //value setting only works after the options are defined and php has the value set prior
-                document.forms[0].category.value = "<?php se($category); ?>";
+                document.forms[0].fromdate.value = "<?php se($fromdate) ?>";
+                document.forms[0].todate.value = "<?php echo ($to_date===$default_date? 0 :$to_date ); ?>";
             </script>
-
-            <select style="color:white;background-color:rgb(4, 144, 64);" class="form-select" aria-label="Default select example" name="range" value="<?php se($range); ?>" data="took">
-                <option disabled>Date Range</option>
-                <option value="<?php echo date('Y-m-d'); ?>">Today</option>
-                <option value="<?php $date = new DateTime(date('Y-m-d'));
-                                $date->modify("-1 day");
-                                echo $date->format("Y-m-d"); ?>">Yesterday</option>
-                <option value="<?php $date = new DateTime(date('Y-m-d'));
-                                $date->modify("-2 day");
-                                echo $date->format("Y-m-d"); ?>">Two Days Ago</option>
-                <option value="<?php $date = new DateTime(date('Y-m-d'));
-                                $date->modify("-5 day");
-                                echo $date->format("Y-m-d"); ?>">5 Days Ago</option>
-                <option value="<?php $date = new DateTime(date('Y-m-d'));
-                                $date->modify("-7 day");
-                                echo $date->format("Y-m-d"); ?>">1 Week Ago</option>
-            </select>
             <script>
                 //quick fix to ensure proper value is selected since
                 //value setting only works after the options are defined and php has the value set prior
@@ -201,7 +194,9 @@ foreach ($result as $mo) {
     </form>
     <div class="row d-flex justify-content-center">
     <div class="input-group-text" style="background-color:rgb(4, 144, 64);color:white;"><b>Total Amount: </b> $<?php se($total) ?></div>
+        <?php $orderid = 0; ?>
         <?php foreach ($result as $order) : ?>
+
             <div class="card">
                 <div></div>
                 <div class="card-body">
