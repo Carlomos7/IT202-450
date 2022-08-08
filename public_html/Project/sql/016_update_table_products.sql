@@ -1,0 +1,1 @@
+UPDATE Products SET Products.average_rating = (SELECT AVG(Ratings.rating) FROM Ratings where Ratings.product_id = Products.id);
