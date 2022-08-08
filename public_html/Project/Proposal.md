@@ -3,7 +3,7 @@
 ## Github Link: [(Prod Branch of Project Folder)](https://github.com/Carlomos7/IT202-450/tree/prod/public_html/Project)
 ## Project Board Link: https://github.com/Carlomos7/IT202-450/projects/1
 ## Website Link: http://cs525-prod.herokuapp.com/Project
-## Project Video: [(IT 202 Summer 2022 Shop Project)]https://www.youtube.com/watch?v=6hCy1O3_vEs
+## Project Video: [[(IT 202 Summer 2022 Shop Project)]](https://www.youtube.com/watch?v=6hCy1O3_vEs)
 ## Your Name: Carlos Segarra
 
 <!-- Line item / Feature template (use this for each bullet point) -- DO NOT DELETE THIS SECTION
@@ -24,7 +24,7 @@
 - Milestone 3
   -  Link to related .md file: [Milestone3.md](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone3.md)
 - Milestone 4
-  -  Link to related .md file: [Milestone4.md][(link url) ](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone4.md)
+  -  Link to related .md file: [[Milestone4.md](link url)](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone4.md)
 ### Intructions
 #### Don't delete this
 1. Pick one project type
