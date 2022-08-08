@@ -1,5 +1,5 @@
 # Project Name: Simple Shop
-## Project Video: https://youtu.be/6hCy1O3_vEs
+## Project Summary: This project will create a simple e-commerce site for users. Administrators or store owners will be able to manage inventory and users will be able to manage their cart and place orders.
 ## Github Link: [(Prod Branch of Project Folder)](https://github.com/Carlomos7/IT202-450/tree/prod/public_html/Project)
 ## Project Board Link: https://github.com/Carlomos7/IT202-450/projects/1
 ## Website Link: http://cs525-prod.herokuapp.com/Project
@@ -17,7 +17,7 @@
 ### Proposal Checklist and Evidence
 
 - Milestone 1
-  -  Link to related .md file: [Milestone2.md](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone1.md)
+  -  Link to related .md file: [[Milestone1.md]](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone1.md)
 - Milestone 2
   -  Link to related .md file: [Milestone2.md](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone2.md)
 - Milestone 3
