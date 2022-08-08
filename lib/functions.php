@@ -33,4 +33,7 @@ require(__DIR__ . "/update_data.php");
 require(__DIR__ . "/get_url.php");
 //paginate pages
 require(__DIR__ . "/paginate.php");
+
+//redirect
+require(__DIR__ . "/redirect.php");
 ?>

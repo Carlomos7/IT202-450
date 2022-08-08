@@ -19,9 +19,33 @@
 }
 nav li{display: inline; background-color: rgb(4, 144, 64);}
 nav li a{color: black}
+#nav-item{color:white;}
+.dropdown-menu{background-color:rgb(4, 144, 64);}
+.dropdown-menu li a:hover{
+    background-color: rgb(191, 82, 121);
+    color: white;
+}
+#blue-button{
+    background-color: rgb(4, 144, 64);
+    color: white;
+}
+.link{color:rgb(191, 82, 121);}
+.link:hover{color: rgb(4, 144, 64);}
 input{border-radius: 5%;}
 body{
     background-color: rgb(220, 220, 220);
     color: rgb(4, 144, 64);
 
 }
+#rating{
+    width: 600px;
+    -webkit-appearance: none;
+}
+#rating::-webkit-slider-thumb {
+    background-color: rgb(4, 144, 64);
+}
+#rating::-webkit-slider-runnable-track{
+    background-color: lightgreen;
+}
+
+  
