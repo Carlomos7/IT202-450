@@ -1,8 +1,9 @@
 # Project Name: Simple Shop
-## Project Summary: (Copy from proposal)
-## Github Link: (Prod Branch of Project Folder)
-## Project Board Link: 
+## Project Summary: This project will create a simple e-commerce site for users. Administrators or store owners will be able to manage inventory and users will be able to manage their cart and place orders.
+## Github Link: [(Prod Branch of Project Folder)](https://github.com/Carlomos7/IT202-450/tree/prod/public_html/Project)
+## Project Board Link: https://github.com/Carlomos7/IT202-450/projects/1
 ## Website Link: http://cs525-prod.herokuapp.com/Project
+## Project Video: [(IT 202 Summer 2022 Shop Project)]https://www.youtube.com/watch?v=6hCy1O3_vEs
 ## Your Name: Carlos Segarra
 
 <!-- Line item / Feature template (use this for each bullet point) -- DO NOT DELETE THIS SECTION
@@ -17,31 +18,13 @@
 ### Proposal Checklist and Evidence
 
 - Milestone 1
-  - [ ] \(mm/dd/yyyy of completion) User will be able to register a new account
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) User will be able to login to their account (given they enter the correct credentials)
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) User will be able to logout
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) Basic security rules implemented
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) Basic Roles implemented
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) Site should have basic styles/theme applied; everything should be styled
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) Any output messages/errors should be “user friendly”
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) User will be able to see their profile
-    -  Link to related .md file: [Link Name](link url)
-  - [ ] \(mm/dd/yyyy of completion) User will be able to edit their profile
-    -  Link to related .md file: [Link Name](link url)
+  -  Link to related .md file: [[Milestone1.md]](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone1.md)
 - Milestone 2
-  - (duplicate template here for Milestone 1 features)
+  -  Link to related .md file: [Milestone2.md](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone2.md)
 - Milestone 3
-  - (duplicate template here for Milestone 1 features)
+  -  Link to related .md file: [Milestone3.md](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone3.md)
 - Milestone 4
-  - (duplicate template here for Milestone 1 features)
-  - 
+  -  Link to related .md file: [Milestone4.md][(link url) ](https://github.com/Carlomos7/IT202-450/blob/prod/public_html/Project/milestone4.md)
 ### Intructions
 #### Don't delete this
 1. Pick one project type
